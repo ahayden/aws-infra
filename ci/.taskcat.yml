@@ -17,69 +17,120 @@ project:
     owner: taskcat
 tests:
   sumologic-role:
-    parameters: sumologic-role-input.json
+    parameters:
+        ExternalID: $[taskcat_random-numbers]
+        Actions: s3:GetObject,s3:GetObjectVersion,s3:ListBucketVersions,s3:ListBucket
+        Resource: arn:aws:s3:::testbucket-3npcu2i3v38u6ijg
     regions:
       - us-east-1
     template: sumologic-role.yaml
   ParkMyCloud:
-    parameters: ParkMyCloud-input.json
+    parameters:
+      PMCRoleName: $[taskcat_random-string]
+      PMCAccountID: 753542375798
+      PMCExternalID: $[taskcat_random-numbers]
     regions:
       - us-east-1
     template: ParkMyCloud.yaml
   AccountAlertTopics:
-    parameters: AccountAlertTopics-input.json
+    parameters:
+      InitialSubscriberEmail: taskcattest@sagebase.org
+      EnableSubscriberSMS: true
+      InitialSubscriberSMS: 1-404-867-5309
+      BillingThreshold: $[taskcat_random-numbers]
+      DeployLambda: true
+      SlackWebhookURL: https://hooks.slack.com/services/slack-webhook-id
+      SlackChannel: "#taskcattest"
+      SlackIconEmoji: ":cloud:"
     regions:
       - us-east-1
     template: AccountAlertTopics.yaml
   jumpcloud:
-    parameters: jumpcloud-input.json
+    parameters:
+       JcServiceApiKey: $[taskcat_random-numbers]
     regions:
       - us-east-1
     template: jumpcloud.yaml
   # test depends on resources in Sage-Bionetworks/admincentral-infra/config/prod/taskcat.yaml
   AddSameRegionBucketDownloadRestriction:
-    parameters: AddSameRegionBucketDownloadRestriction-input.json
+    parameters:
+      BucketName: taskcat-tastcatsynapsebucket-oeg42xg2hitp
+      SameRegionResourceAccessToBucketGrantVpcAccess: vpc-26976a5d
     regions:
       - us-east-1
     template: AddSameRegionBucketDownloadRestriction.yaml
   bootstrap:
-    parameters: bootstrap-input.json
+    parameters:
+        CfBucketVersioning: Suspended
     regions:
       - us-east-1
     template: bootstrap.yaml
   vpc:
-    parameters: vpc-input.json
+    parameters:
+      VpcName: taskcattestvpc
+      VpcSubnetPrefix: "10.254"
+      PublicSubnetZones: $[taskcat_genaz_3]
+      PrivateSubnetZones: $[taskcat_genaz_3]
+      VpnCidr: 10.1.0.0/16
     regions:
       - us-east-1
     template: vpc.yaml
   ec2-backup:
-    parameters: ec2-backup-input.json
+    parameters:
+      StackName: $[taskcat_random-string]
+      SnapshotCount: 1
     regions:
       - us-east-1
     template: ec2-backup.yaml
 
   # Tests disabled due to issue: https://github.com/aws-quickstart/taskcat/issues/278
-  #  s3-bucket:
-  #    parameter_input: s3-bucket-input.json
-  #    regions:
-  #      - us-east-1
-  #    template_file: s3-bucket.yaml
-  #  managed-batch:
-  #    parameter_input: managed-batch-input.json
-  #    regions:
-  #      - us-east-1
-  #    template_file: managed-batch.yaml
-
+# s3-bucket:
+#   parameters:
+#     AllowWriteBucket: true
+#     EncryptBucket: true
+#     BucketVersioning: Enabled
+#     SynapseUserName: jsmith
+#     Department: $[taskcat_random-string]
+#     Project: $[taskcat_random-string]
+#     OwnerEmail: jsmith@sagebase.org
+#     EnableDataLifeCycle: Enabled
+#     LifecycleDataTransition: 60
+#     LifecycleDataStorageClass: STANDARD_IA
+#     LifecycleDataExpiration: 360
+#   regions:
+#     - us-east-1
+#   template: s3-bucket.yaml
+# managed-batch:
+#   parameters:
+#     VpcName: it-services
+#     Department: Platform
+#     Project: Infrastructure
+#     OwnerEmail: taskcat@sagebase.org
+#     ContainerCommands: ['echo', 'Hello World']
+#   regions:
+#     - us-east-1
+#   template: managed-batch.yaml
 
   # Stack deletion fails when taskcat attempts to delete bucket
-  # s3web-bucket:
-  #   parameter_input: s3web-bucket-input.json
-  #   regions:
-  #     - us-east-1
-  #   template_file: managed-s3Web.yaml
+# s3web-bucket:
+#   parameters:
+#     DomainName: $[taskcat_random-string]
+#     SubDomainName: $[taskcat_random-string]
+#     Department: $[taskcat_random-string]
+#     Project: $[taskcat_random-string]
+#     OwnerEmail: jsmith@sagebase.org
+#   regions:
+#     - us-east-1
+#   template: managed-s3Web.yaml
   # Cloudfront adds to much time to the test (~60 mins to deploy and cleanup). Also taskcat fails to cleanup.
-  # s3web-cloudfront-bucket:
-  #   parameter_input: s3web-cloudfront-bucket-input.json
-  #   regions:
-  #     - us-east-1
-  #   template_file: managed-s3WebCloudfront.yaml
+# s3web-cloudfront-bucket:
+#   parameters:
+#      DomainName: sagebase.org
+#      SubDomainName: taskcat
+#      AcmCertificateArn: arn:aws:acm:us-east-1:745159704268:certificate/06bb93e7-37ba-4090-88ee-c7d29022e217
+#      Department: $[taskcat_random-string]
+#      Project: $[taskcat_random-string]
+#      OwnerEmail: jsmith@sagebase.org
+#   regions:
+#     - us-east-1
+#   template: managed-s3WebCloudfront.yaml
